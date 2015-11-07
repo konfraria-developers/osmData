@@ -11,7 +11,7 @@ def get_hash(population, dataset):
         directori = os.path.join(app.config['data_dir'], population, '{}.hash'.format(dataset))
     else:
         directori = os.path.join(population, '{}.hash'.format(dataset))
-    f = open(dir)
+    f = open(directori)
     data = f.read()
     f.close()
     return data
@@ -24,7 +24,7 @@ def get_data(population, dataset):
         directori = os.path.join(app.config['data_dir'], population, '{}.hash'.format(dataset))
     else:
         directori = os.path.join(population, '{}.json'.format(dataset))
-    f = open(dir)
+    f = open(directori)
     data = f.read()
     f.close()
     return data
