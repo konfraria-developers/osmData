@@ -1,7 +1,10 @@
-from flask import Flask, abort
+from flask import Flask, abort, Response
+from flask.ext.cors import CORS
+
 from configobj import ConfigObj
 
 app = Flask(__name__)
+CORS(app)
 app.debug = True
 
 
@@ -16,12 +19,13 @@ def get_hash(population, dataset):
         f = open(directori)
         data = f.read()
         f.close()
+        return data
     else:
         abort(404)
-    return data
 
 
-@app.route('/data/<string:population>/<string:dataset>')
+
+@app.route('/data/<string:population>/<string:dataset>.json')
 def get_data(population, dataset):
     import os
     if 'data_dir' in app.config:
@@ -30,17 +34,16 @@ def get_data(population, dataset):
         directori = os.path.join(population, '{}.json'.format(dataset))
     app.logger.debug(directori)
     if os.path.isfile(directori):
-
         f = open(directori)
-        data = f.read()
+        data = '['+f.read()+']'
         f.close()
+        resp = Response(response=data, status=200, content_type='text/plain; charset=utf-8')
+        return resp
     else:
         abort(404)
-    return data
 
 
 if __name__ == '__main__':
     config = ConfigObj('osmdata.conf')
     app.config.update(config)
-    app.logger.debug(config)
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8080)
