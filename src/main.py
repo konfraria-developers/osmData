@@ -1,4 +1,5 @@
 from flask import Flask
+from configobj import ConfigObj
 app = Flask(__name__)
 app.debug = True
 
@@ -6,7 +7,10 @@ app.debug = True
 @app.route('/hash/<string:population>/<string:dataset>')
 def get_hash(population, dataset):
     import os
-    dir = os.path.join(population, '{}.hash'.format(dataset))
+    if 'data_dir' in app.config:
+        dir = os.path.join(app.config['data_dir'], population, '{}.hash'.format(dataset))
+    else:
+        dir = os.path.join(population, '{}.hash'.format(dataset))
     f = open(dir)
     data = f.read()
     f.close()
@@ -16,7 +20,10 @@ def get_hash(population, dataset):
 @app.route('/data/<string:population>/<string:dataset>')
 def get_data(population, dataset):
     import os
-    dir = os.path.join(population, '{}.json'.format(dataset))
+    if 'data_dir' in app.config:
+        dir = os.path.join(app.config['data_dir'], population, '{}.hash'.format(dataset))
+    else:
+        dir = os.path.join(population, '{}.json'.format(dataset))
     f = open(dir)
     data = f.read()
     f.close()
@@ -24,4 +31,7 @@ def get_data(population, dataset):
 
 
 if __name__ == '__main__':
-    app.run()
+    config = ConfigObj('osmdata.conf')
+    app.config.update(config)
+    app.logger.debug(config)
+    app.run(host='0.0.0.0')
